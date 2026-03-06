@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Landing Order Page</title>
+
+<style>
+body{
+  margin:0;
+  font-family: Arial, sans-serif;
+  background:#f8f8f8;
+}
+
+.container{
+  max-width:800px;
+  margin:auto;
+  background:#fff;
+  padding:20px;
+}
+
+img{
+  width:100%;
+  max-height:420px;
+  object-fit:cover;
+  border-radius:10px;
+}
+
+h1{
+  font-size:22px;
+  margin:15px 0;
+}
+
+.price{
+  font-size:26px;
+  font-weight:bold;
+  color:#d60000;
+  margin:10px 0;
+}
+
+.desc{
+  white-space:pre-line;
+  margin-top:15px;
+  font-size:15px;
+}
+
+form{
+  margin-top:25px;
+}
+
+label{
+  display:block;
+  margin-top:15px;
+  font-weight:600;
+}
+
+input, textarea{
+  width:100%;
+  padding:12px;
+  margin-top:5px;
+  border-radius:6px;
+  border:1px solid #ccc;
+  font-size:15px;
+}
+
+button{
+  margin-top:20px;
+  padding:15px;
+  width:100%;
+  background:linear-gradient(45deg,#d60000,#ff9900);
+  border:none;
+  color:white;
+  font-size:18px;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+button:hover{
+  opacity:0.9;
+}
+
+.close-btn{
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  width: 38px;
+  height: 38px;
+  background: #ffffff;
+  color: #333;
+  text-decoration: none;
+  font-size: 22px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 9999;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover{
+  background: #f1f1f1;
+  transform: scale(1.08);
+}
+
+.extra-buttons{
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.btn{
+  display: block;
+  text-align: center;
+  padding: 14px;
+  border-radius: 50px;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  transition: 0.2s ease;
+}
+
+/* WhatsApp */
+.whatsapp{
+  background: #25D366;
+}
+
+.whatsapp:hover{
+  background: #1ebe5d;
+}
+
+/* Messenger */
+.messenger{
+  background: #1877F2;
+}
+
+.messenger:hover{
+  background: #0f65d9;
+}
+
+/* Call */
+.call{
+  background: #0f9d58;
+}
+
+.call:hover{
+  background: #0c7f47;
+}
+</style>
+</head>
+
+<body>
+<a href="index.html" class="close-btn">✕</a>
+
+<div class="container">
+  <h1 id="title">Loading...</h1>
+  <img id="image" src="">
+  <div class="price" id="price"></div>
+  <div class="desc" id="desc"></div>
+
+  <h2 style="margin-top:30px;">অর্ডার কনফার্ম করুন</h2>
+
+  <form id="orderForm">
+
+ <label>আপনার নাম *</label> 
+    <input type="text" id="name" required>
+
+   <label>মোবাইল নম্বর *</label>
+    <input type="tel" id="phone" required>
+
+  <!--  <label>জেলা *</label>
+    <input type="text" id="district" required>
+
+    <label>উপজেলা *</label>
+    <input type="text" id="upazila" required>
+
+    <label>থানা *</label>
+    <input type="text" id="thana" required>
+
+    <label>ইউনিয়ন / ওয়ার্ড *</label>
+    <input type="text" id="union" required> -->
+
+    <label>বিস্তারিত ঠিকানা *</label>
+    <textarea id="address" rows="3" required></textarea>
+
+    <button type="submit">অর্ডার প্লেস করুন</button>
+<div class="extra-buttons">
+
+  <a href="https://wa.me/8801770019872" target="_blank" class="btn whatsapp">
+    WhatsApp এ অর্ডার করুন
+  </a>
+
+  <a href="https://m.me/yourusername" target="_blank" class="btn messenger">
+    Messenger এ অর্ডার করুন
+  </a>
+
+  <a href="tel:01770019872" class="btn call">
+    কল করুন - 01770019872
+  </a>
+
+</div>
+  </form>
+
+</div>
+
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { 
+  getFirestore, 
+  doc, 
+  getDoc, 
+  collection, 
+  addDoc, 
+  serverTimestamp 
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDi1R_E662VnaSZwbTQCT_eYhmDVDOkL9M",
+  authDomain: "online-bazaar-bd.firebaseapp.com",
+  projectId: "online-bazaar-bd",
+  storageBucket: "online-bazaar-bd.firebasestorage.app",
+  messagingSenderId: "126666569068",
+  appId: "1:126666569068:web:ca14294e0d1b62c8472f49",
+  measurementId: "G-10VDRSBG1X"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const urlParams = new URLSearchParams(window.location.search);
+const productId = urlParams.get("id");
+
+let currentProduct = null;
+
+/* ================= LOAD PRODUCT ================= */
+
+if(productId){
+
+  const docRef = doc(db, "products", productId);
+
+  getDoc(docRef).then((docSnap) => {
+
+    if (!docSnap.exists()) {
+      document.body.innerHTML = "<h2>Product Not Found</h2>";
+      return;
+    }
+
+    const p = docSnap.data();
+    currentProduct = p;
+
+    document.getElementById("title").innerText = p.name;
+    document.getElementById("image").src = p.image;
+    document.getElementById("price").innerText = "৳ " + p.price;
+    document.getElementById("desc").innerText = p.description || "";
+
+  });
+
+}
+
+/* ================= ORDER SUBMIT ================= */
+
+document.getElementById("orderForm")
+.addEventListener("submit", async (e)=>{
+
+  e.preventDefault();
+
+  if(!currentProduct){
+    alert("Product load হয়নি");
+    return;
+  }
+
+  const name = document.getElementById('name').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const address = document.getElementById('address').value.trim();
+
+  if(!name || !phone || !address){
+    alert("নাম, মোবাইল এবং ঠিকানা অবশ্যই পূরণ করুন");
+    return;
+  }
+
+  const order = {
+    productId: productId,
+    productName: currentProduct.name,
+    price: currentProduct.price,
+    discount: currentProduct.discount || 0,
+    name: name,
+    phone: phone,
+    district: "নেই",
+    upazila: "নেই",
+    thana: "নেই",
+    union: "নেই",
+    address: address,
+    date: new Date().toLocaleString('bn-BD'),
+    createdAt: serverTimestamp()
+  };
+
+  try{
+    await addDoc(collection(db, "orders"), order);
+    alert("অর্ডার সফলভাবে গ্রহণ করা হয়েছে!");
+    e.target.reset();
+  }
+  catch(error){
+    console.error(error);
+    alert("অর্ডার করতে সমস্যা হয়েছে");
+  }
+
+});
+
+</script>
+
+</body>
+      </html>
